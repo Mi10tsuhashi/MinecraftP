@@ -1,0 +1,62 @@
+name:  MinecraftP
+main:  main.MinecraftP
+version:  0.31
+api-version: 1.13
+author:  Mituhashi
+commands:
+   want:
+       description: give plugins items.
+       usage: /want
+   loc:
+       description:  This handle player's location data. Take the save, tp, get arguments.
+       usage: /loc
+   disable:
+       description: disable something...
+       usage: /disable
+permissions:
+    mp.*:
+        description:  give access to all MinecraftP commands and enable use item.
+        children:
+            mp.loc.get:  true
+            mp.loc.save:  true
+            mp.loc.tp:  true
+            mp.item:  true
+            mp.item.use:  true
+            mp.sign:  true
+            mp.disable:  true
+            mp.disable.chest:  true
+            mp.disable,join:  true
+    mp.loc.get:   
+        description:  give access /loc get command.
+        default:  true
+    mp.loc.tp: 
+        description:  give access /loc tp command.
+        default:  op
+    mp.loc.save: 
+        description:  give access /loc save command.
+        default:  op
+    mp.item.*:
+        description:  give access /want command and enable use item.
+        children:  
+            mp.item.use:  true
+    mp.item:
+        description:  give access /want command.
+        default:  op
+    mp.item.use:  
+        description:   enable use item.
+        default:  true
+    mp.sign:
+        description:  create checkpoint sign.
+        default:  op
+    mp.disable:
+        description:  give access /disable command.
+        default:  op
+    mp.disable.join: 
+        description:  give access /disable join command.
+        default:  op
+    mp.disable.chest:  
+        description:  give access /disable chest command.
+        default:  op
+   
+
+    
