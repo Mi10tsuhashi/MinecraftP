@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Sign;
@@ -38,6 +39,8 @@ public class createItem extends ItemStack{
     static ItemStack Up = createItem.getUp();
     static ItemStack guide = createItem.getGuide();
     static ItemStack checkpoint = createItem.getSign();
+    static ItemStack config = createItem.getConfigItem();
+    static ItemStack close = createItem.getClose();
 	 public static ItemStack getSign() {
 		 ItemStack signItem = new ItemStack(XMaterial.SIGN.parseItem());
 		 BlockStateMeta meta =(BlockStateMeta) signItem.getItemMeta();
@@ -45,9 +48,6 @@ public class createItem extends ItemStack{
 		 sign.setLine(0, ChatColor.GREEN+"["+ChatColor.GOLD+"CheckPoint"+ChatColor.GREEN+"]");
 		 meta.setBlockState(sign);
 		 meta.setDisplayName(ChatColor.GOLD+"CheckPoint");
-		//glowItem glow = new glowItem("MENDING");
-		//meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-		//meta.addEnchant(glow, 1, true);
 		 List<String> list = new ArrayList<String>();
 			String lores0 = ChatColor.BLUE+"It is a sign for";
 			String lores1 = ChatColor.BLUE+"setting checkpoint.";
@@ -57,6 +57,13 @@ public class createItem extends ItemStack{
 		 signItem.setItemMeta(meta);
 		 return signItem;
 	 }
+	 public static ItemStack getClose() {
+		 ItemStack close = new ItemStack(Material.BARRIER);
+		 ItemMeta meta = close.getItemMeta();
+		 meta.setDisplayName("close");
+		 close.setItemMeta(meta);
+		 return close;
+	 }
      public static ItemStack getCeator() {
     	    ItemStack creator = new ItemStack(XMaterial.CLOCK.parseItem());
     	    ItemMeta meta = creator.getItemMeta();
@@ -65,9 +72,6 @@ public class createItem extends ItemStack{
 			String lore0 = ChatColor.BLUE+"RightClick to open a GUI.";
 			lorelist.add(0,lore0);
 			meta.setLore(lorelist);
-			//glowItem glow = new glowItem("MENDING");
-			//meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-			//meta.addEnchant(glow, 1, true);
 			creator.setItemMeta(meta);
     	 return creator;
      }
@@ -97,7 +101,7 @@ public class createItem extends ItemStack{
 			dye.setItemMeta(Meta);
     	    return dye;
      }
-     public static ItemStack getStart() {
+     public static ItemStack getStart()  {
  	    ItemStack start = new ItemStack(XMaterial.LIME_WOOL.parseItem());
  	    ItemMeta meta = start.getItemMeta();
  	     meta.setDisplayName(ChatColor.GOLD+"Set start");
@@ -106,9 +110,6 @@ public class createItem extends ItemStack{
 			String lore1 = ChatColor.BLUE+"spot of parkours.";
 			lorelist.add(0,lore0); lorelist.add(1,lore1);
 			meta.setLore(lorelist);
-			//glowItem glow = new glowItem("MENDING");
-			//meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-			//meta.addEnchant(glow, 1, true);
 			start.setItemMeta(meta);
  	 return start;
   }
@@ -121,9 +122,6 @@ public class createItem extends ItemStack{
  	     String lore1 = ChatColor.BLUE+"spot of parkours.";
  	     lorelist.add(0,lore0); lorelist.add(1,lore1);
  	     meta.setLore(lorelist);
- 	    // glowItem glow = new glowItem("MENDING");
-		 //meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-	     //meta.addEnchant(glow, 1, true);
          Goal.setItemMeta(meta);
   	     return Goal;
    }
@@ -131,9 +129,6 @@ public class createItem extends ItemStack{
     	 ItemStack Guide = new ItemStack(XMaterial.BOOK.parseItem());
     	 ItemMeta meta = Guide.getItemMeta();
     	 meta.setDisplayName(ChatColor.GOLD+"Guide");
-    	 //glowItem glow = new glowItem("MENDING");
-		 //meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-		 //meta.addEnchant(glow, 1, true);
 		 List<String> lorelist = new ArrayList<String>();
  	     String lore0 = ChatColor.BLUE+"Right click to display";
  	     String lore1 = ChatColor.BLUE+"elapsed time.";
@@ -157,12 +152,6 @@ public class createItem extends ItemStack{
     	 ItemStack Config = new ItemStack(XMaterial.BONE.parseItem());
     	 ItemMeta meta = Config.getItemMeta();
     	 meta.setDisplayName(ChatColor.GOLD+"Config");
-    	 List<String> lorelist = new ArrayList<String>();
- 	     String lore0 = ChatColor.BLUE+"This will be to switch the";
- 	     String lore1 = ChatColor.BLUE+"language of items description.";
- 	     String lore2 = ChatColor.BLUE+"(Not yet implemented)";
- 	     lorelist.add(0,lore0); lorelist.add(1,lore1); lorelist.add(2,lore2);
- 	     meta.setLore(lorelist);
     	 Config.setItemMeta(meta);
     	 return Config;
      }
@@ -337,6 +326,7 @@ public class createItem extends ItemStack{
 					 customInventory.setItem(0, start);
 					 customInventory.setItem(1, goal);
 					 customInventory.setItem(2, checkpoint);
+					 customInventory.setItem(8, close);
 					 player.openInventory(customInventory);
 				}
 				if( player.getInventory().getItemInMainHand().equals(quit)
@@ -357,6 +347,15 @@ public class createItem extends ItemStack{
 					createItem.guideMethod(player);
 	     	        e.setCancelled(true);
 	     	     return;
+				}
+				if( player.getInventory().getItemInMainHand().equals(config)
+						|| player.getInventory().getItemInOffHand().equals(config) ) {
+					Inventory customInventory = Bukkit.createInventory(null, 9,"Config");
+					customInventory.setItem(8, close);
+					player.openInventory(customInventory);
+					 e.setCancelled(true);
+	                return;
+
 				}
 	}
 

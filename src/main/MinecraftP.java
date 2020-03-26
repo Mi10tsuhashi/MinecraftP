@@ -8,11 +8,9 @@ package main;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import Event.Eventlis;
@@ -23,7 +21,6 @@ import utility.InventoryMethod;
 import utility.LocationMethod;
 import utility.TabComplete;
 import utility.createItem;
-import utility.glowItem;
 
 
 
@@ -40,7 +37,6 @@ public class MinecraftP extends JavaPlugin{
 	@Override
 	public void onEnable() {
 		plugin=this;
-		plugin.getLogger().info("minecraftP multiple");
 		getCommand("want").setExecutor(new WantCommand());
 		getCommand("loc").setExecutor(new LocationCommand(this));
 		getCommand("disable").setExecutor(new DisableCommand(this));
@@ -48,7 +44,6 @@ public class MinecraftP extends JavaPlugin{
 		getCommand("want").setTabCompleter(new TabComplete());
 		getCommand("disable").setTabCompleter(new TabComplete());
 		getCommand("loc").setTabCompleter(new TabComplete());
-		//registerGlow();
 		new LocationMethod(this);
 		new InventoryMethod(this);
 		new createItem(this);
@@ -137,25 +132,7 @@ public class MinecraftP extends JavaPlugin{
 			e.printStackTrace();
 		}
 	}
-	public void registerGlow() {
-        try {
-            Field f = Enchantment.class.getDeclaredField("acceptingNew");
-            f.setAccessible(true);
-            f.set(null, true);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            glowItem glow = new glowItem("mending");
-            Enchantment.registerEnchantment(glow);
-        }
-        catch (IllegalArgumentException e){
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
-    }
+
    public static MinecraftP getPlugin() {
 	   return plugin;
    }

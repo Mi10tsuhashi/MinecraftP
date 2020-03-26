@@ -1,8 +1,11 @@
 package utility;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryEvent;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import main.MinecraftP;
@@ -44,6 +47,22 @@ public class InventoryMethod {
         player.getInventory().setContents(inventory);
         player.getInventory().setArmorContents(armor);
         player.updateInventory();
+	}
+
+	public static String getNameX(InventoryEvent InventoryE) {
+		String name = null;
+		if(XMaterial.isMoreThan1_14()) {
+				try {
+					InventoryView view = (InventoryView)InventoryEvent.class.getMethod("getView").invoke(InventoryE);
+					name = view.getTitle();
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
+						| NoSuchMethodException | SecurityException e) {
+					e.printStackTrace();
+				}
+				return name;
+		}
+			return InventoryE.getInventory().getName();
+
 	}
 	public static void SetStartItem(Player player) {
 		 player.getInventory().setItem(0,createItem.getTeleporter());

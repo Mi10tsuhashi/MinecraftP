@@ -1,5 +1,12 @@
 package utility;
 
+
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -16,46 +23,76 @@ public enum XMaterial {
      LIGHT_WEIGHTED_PRESSURE_PLATE(0, "GOLD_PLATE"),
      LIME_WOOL(5, "WOOL"),
 	 RED_WOOL(14, "WOOL"),
-	 ROSE_RED(1, "INK_SACK"),
-	 SIGN(0,"SIGN","SIGN_POST"),
-	 WALL_SIGN(0, "WALL_SIGN"),
+	 ROSE_RED(1, "INK_SACK","RED_DYE"),//1.14 非互換
+	 //parseItem only
+	 SIGN(0,"OAK_SIGN","SPRUCE_SIGN","BIRCH_SIGN","JUNGLE_SIGN","ACACIA_SIGN","DARK_OAK_SIGN"),
+	 //Material only
+	 SIGN_POST(0,"SIGN","OAK_SIGN","SPRUCE_SIGN","BIRCH_SIGN","JUNGLE_SIGN","ACACIA_SIGN","DARK_OAK_SIGN"),
+	 WALL_SIGN(0, "OAK_WALL_SIGN","SPRUCE_WALL_SIGN","BIRCH_WALL_SIGN","JUNGLE_WALL_SIGN","ACACIA_WALL_SIGN","DARK_OAK_WALL_SIGN"),
 	 ;
-	String[] m;
+	String[] alias;
     int data;
 
     XMaterial(int data, String... m){
-        this.m = m;
+        this.alias = m;
         this.data = data;
     }
-    @SuppressWarnings("deprecation")
-	public ItemStack parseItem(){
+    public ItemStack parseItem(){
         Material mat = parseMaterial();
-        if(isNewVersion()){
-            return new ItemStack(mat);
+        if(isLessThan1_12()){
+        	return new ItemStack(mat,1,(byte) data);
         }
-        return new ItemStack(mat,1,(byte) data);
+        return new ItemStack(mat);
     }
-    public static boolean isNewVersion(){
+    public ItemStack[] parseItems(){
+        Set<Material> resultSet = parseMaterials();
+        List<ItemStack> rs = new ArrayList<>();
+        resultSet.forEach(e->{
+        	if(isLessThan1_12()){
+            	rs.add(new ItemStack(e,1,(byte) data));
+            }else {
+                rs.add(new ItemStack(e));
+            }
+        });
+        return (ItemStack[])rs.toArray();
+
+    }
+    public static boolean isLessThan1_12(){
         Material mat = Material.getMaterial("RED_WOOL");
-        if(mat != null){
+        if(mat == null){
             return true;
         }
         return false;
     }
+   public static boolean isMoreThan1_14() {
+	   Material mat = Material.getMaterial("OAK_WALL_SIGN");
+	   if(mat == null){
+           return false;
+       }
+	   return true;
+   }
     public Material parseMaterial(){
         Material mat = Material.matchMaterial(this.toString());
-        if(mat != null){
+        if(mat!=null){
             return mat;
+        }for(int i=0; i<alias.length; i++) {
+        mat = Material.matchMaterial(alias[i]);
+        if(mat!=null) {return mat;}
         }
-        return Material.matchMaterial(m[0]);
+        return mat;
     }
-    public Material parseMaterial(int i){
+    public Set<Material> parseMaterials(){
+        Set<Material> result = new HashSet<>();
         Material mat = Material.matchMaterial(this.toString());
-        if(isNewVersion()){
-            return mat;
+        if(mat!=null){
+            result.add(mat);
+        }for(int i=0; i<alias.length; i++) {
+        mat = Material.matchMaterial(alias[i]);
+        if(mat!=null) {result.add(mat);}
         }
-        return Material.valueOf(m[i]);
+        return result;
     }
+
 
 
 }

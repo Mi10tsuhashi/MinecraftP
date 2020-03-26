@@ -320,14 +320,10 @@ public class Eventlis implements Listener{
 	}
 	@EventHandler
 	public void InventoryEvent(InventoryClickEvent e) {
-		Inventory customInventory = Bukkit.createInventory(null, 9,"Click to Get!");
 		 ItemStack start = createItem.getStart();
 		 ItemStack goal = createItem.getGoal();
 		 ItemStack checkpoint = createItem.getSign();
-		 customInventory.setItem(0, start);
-		 customInventory.setItem(1, goal);
-		 customInventory.setItem(2, checkpoint);
-		 Inventory inv = e.getInventory();
+		 ItemStack close = createItem.getClose();
 		 Player player = (Player) e.getWhoClicked();
 		 if(e.getCurrentItem()==null) {return;}
 		 if( e.getCurrentItem().equals(createItem.getShow())) {
@@ -389,8 +385,8 @@ public class Eventlis implements Listener{
 
 
 		 }
-		 if((inv.getName().equals(customInventory.getName()))){
-		 if(inv.getName().equals(customInventory.getName())) {
+
+		 if(InventoryMethod.getNameX(e).equals("Click to Get!")) {
 			 if (e.getCurrentItem().equals(start)){
 				 if(player.getInventory().contains(start)) {player.closeInventory();
 	             e.setCancelled(true);
@@ -415,9 +411,17 @@ public class Eventlis implements Listener{
 				 player.closeInventory();
 	             e.setCancelled(true);
 			 }
+			 if (e.getCurrentItem().equals(close)){
+					player.closeInventory();
+		            e.setCancelled(true);
+				 }
+           return;
 		 }
-
-
+		 if(InventoryMethod.getNameX(e).equals("Config")) {
+			 if (e.getCurrentItem().equals(close)){
+				player.closeInventory();
+	            e.setCancelled(true);
+			 }
            return;
 		 }
 	}
@@ -472,7 +476,7 @@ public class Eventlis implements Listener{
     	Player player =e.getPlayer();
 
     	if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-    		if(b.getType()==XMaterial.SIGN.parseMaterial(1)||b.getType()==XMaterial.WALL_SIGN.parseMaterial()) {
+    		if(XMaterial.SIGN_POST.parseMaterials().contains(b.getType())||XMaterial.WALL_SIGN.parseMaterials().contains(b.getType())) {
     			Sign s = (Sign)b.getState();
     			String[] line = s.getLines();
     			String l1 = line[0];
