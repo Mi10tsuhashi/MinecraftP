@@ -270,6 +270,21 @@ public class Eventlis implements Listener{
 	    }
 
 	}
+	private static boolean hasItem(Player player,ItemStack item) {
+		try {
+		if( player.getInventory().getItemInMainHand().equals(item)
+				|| player.getInventory().getItemInOffHand().equals(item) ) {
+              return true;
+				}
+		} catch(NoSuchMethodError error) {
+			if(player.getInventory().getItemInHand().equals(item)) {
+				return true;
+			}else {
+				return false;
+			}
+		}
+		return false;
+	}
 	@EventHandler
 	public void BlockPlace(BlockPlaceEvent e) {
 	    Player player =  e.getPlayer();
@@ -281,8 +296,7 @@ public class Eventlis implements Listener{
 	    String X = String.valueOf(x);
 	    String Y = String.valueOf(y);
 	    String Z = String.valueOf(z);
-	    if( player.getInventory().getItemInMainHand().equals(start)
-				|| player.getInventory().getItemInOffHand().equals(start) ) {
+	    if( hasItem(player,start) ) {
 	    	if(!player.hasPermission("mp.item.use")) {
 	    		player.sendMessage(ChatColor.YELLOW+"[ERROR] "+ChatColor.GRAY+"You don't have enough permissions.   (permission: mp.item.use)");
 	    		return;
@@ -299,8 +313,7 @@ public class Eventlis implements Listener{
 	    	plugin.getParkourConfig().set("start", l);
 	    	plugin.saveParkourConfig();
 	    }
-	    if( player.getInventory().getItemInMainHand().equals(goal)
-				|| player.getInventory().getItemInOffHand().equals(goal) ) {
+	    if( hasItem(player,goal) ) {
 	    	if(!player.hasPermission("mp.item.use")) {
 	    		player.sendMessage(ChatColor.YELLOW+"[ERROR] "+ChatColor.GRAY+"You don't have enough permissions.   (permission: mp.item.use)");
 	    		return;
@@ -345,7 +358,7 @@ public class Eventlis implements Listener{
 	    	            	i.setItem(0,createItem.getTeleporter());
 	    	            }
 	    	        }, 1L);
-	    	        Sound sound= Sound.BLOCK_CHEST_OPEN;
+	    	        Sound sound= XSounds.BLOCK_CHEST_OPEN.parseSound();
 	                player.playSound(player.getLocation(), sound, 3.0f, 1.0f);
 	                player.closeInventory();
 		             e.setCancelled(true);
@@ -488,7 +501,7 @@ public class Eventlis implements Listener{
                 		}
                 	LocationMethod.saveLocation(player);
                     player.sendMessage("Checkpoint was registered.");
-                    Sound sound= XSounds.BLOCK_NOTE_BLOCK_BELL.parseSounds();
+                    Sound sound= XSounds.BLOCK_NOTE_BLOCK_BELL.parseSound();
                     player.playSound(player.getLocation(), sound, 3.0f, 2.0f);
                 }
     		}
@@ -516,12 +529,16 @@ public class Eventlis implements Listener{
 	public void rightClick(PlayerInteractEvent e) {
 		Player player = e.getPlayer();
 		if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK)||e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
+			try {
 			if (!(e.getHand() == EquipmentSlot.HAND)) {
 				if(e.getHand() == EquipmentSlot.OFF_HAND&&player.getInventory().getItemInOffHand().equals(createItem.getTeleporter())) {
 					e.setCancelled(true);
 				}
 				return;
 				}
+			} catch(NoSuchMethodError error) {
+				// less than 1.8.x
+			}
 			createItem.rightClick(player, e);
 			return;
 

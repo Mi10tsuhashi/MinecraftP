@@ -1,5 +1,6 @@
 package utility;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -24,6 +25,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import main.MinecraftP;
 
 
+
 public class createItem extends ItemStack{
 
 	static MinecraftP plugin;
@@ -46,6 +48,29 @@ public class createItem extends ItemStack{
 		 BlockStateMeta meta =(BlockStateMeta) signItem.getItemMeta();
 		 Sign sign = (Sign) meta.getBlockState();
 		 sign.setLine(0, ChatColor.GREEN+"["+ChatColor.GOLD+"CheckPoint"+ChatColor.GREEN+"]");
+		 try {
+		 sign.update();
+		 }catch(IllegalStateException e) {
+			 //Code using nms and craftbukkit
+			 //Called in version 1.11 or lower
+			 //works with 1.9.x~1.11.x not working with 1.8.x
+			 try {
+                final String VERSION =Bukkit.getServer().getClass().getPackage().getName().substring(23);
+				Class<?> craftSign = Class.forName("org.bukkit.craftbukkit."+VERSION+".block"+".CraftSign");
+				Method sanitizeLines = craftSign.getMethod("sanitizeLines", String[].class);
+				Object newLines = sanitizeLines.invoke(null,new Object[] { sign.getLines()});
+				Method getTileEntity =craftSign.getMethod("getTileEntity");
+				Class<?> tileE = Class.forName("net.minecraft.server."+VERSION+".TileEntitySign");
+				Object lines = tileE.getField("lines").get(getTileEntity.invoke(sign));
+				System.arraycopy(newLines, 0, lines, 0, 4);
+				tileE.getMethod("update").invoke(getTileEntity.invoke(sign));
+			}catch(NoSuchMethodException e2){
+				e2.printStackTrace();
+			}
+			 catch (Exception e3) {
+				e3.printStackTrace();
+			}
+		 }
 		 meta.setBlockState(sign);
 		 meta.setDisplayName(ChatColor.GOLD+"CheckPoint");
 		 List<String> list = new ArrayList<String>();
@@ -187,7 +212,7 @@ public class createItem extends ItemStack{
 		String uuid = player.getUniqueId().toString();
 		if(!plugin.getParkourConfig().getBoolean("isPlaying."+uuid)) {
 			player.sendMessage(ChatColor.GRAY+"You are not playing parkour now.");
-			Sound sound= Sound.ENTITY_ITEM_BREAK;
+			Sound sound= XSounds.ENTITY_ITEM_BREAK.parseSound();
             player.playSound(player.getLocation(), sound, 3.0f, 0.5f);
 			return;
 		}
@@ -196,7 +221,7 @@ public class createItem extends ItemStack{
     	plugin.saveParkourConfig();
     	player.setMetadata("TP", new FixedMetadataValue(plugin, 0));
         player.teleport(player.getWorld().getSpawnLocation());
-        Sound sound= XSounds.BLOCK_NOTE_BLOCK_XYLOPHONE.parseSounds();
+        Sound sound= XSounds.BLOCK_NOTE_BLOCK_XYLOPHONE.parseSound();
         player.playSound(player.getLocation(), sound, 3.0f, 0.5f);
         player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 	    player.removePotionEffect(PotionEffectType.SATURATION);
@@ -217,7 +242,7 @@ public class createItem extends ItemStack{
 		String uuid = player.getUniqueId().toString();
 		if(!plugin.getParkourConfig().getBoolean("isPlaying."+uuid)) {
 			player.sendMessage(ChatColor.GRAY+"You are not playing parkour now.");
-			Sound sound= Sound.ENTITY_ITEM_BREAK;
+			Sound sound= XSounds.ENTITY_ITEM_BREAK.parseSound();
             player.playSound(player.getLocation(), sound, 3.0f, 0.5f);
 			return;
 		}
@@ -244,7 +269,7 @@ public class createItem extends ItemStack{
 	     if(day==0&&hours==0&&minutes==0) {
 	        player.sendMessage(ChatColor.GRAY+""+seconds+"."+Time+"s");
 	        }
-	    Sound sound= XSounds.BLOCK_NOTE_BLOCK_GUITAR.parseSounds();
+	    Sound sound= XSounds.BLOCK_NOTE_BLOCK_GUITAR.parseSound();
         player.playSound(player.getLocation(), sound, 3.0f, 2.0f);
 	}
 	public static void teleportMethod(Player player) {
@@ -274,7 +299,7 @@ public class createItem extends ItemStack{
 					            }
 					        }, 1L);
 						    player.sendMessage(ChatColor.GRAY+"Teleported.");
-						    Sound sound= XSounds.BLOCK_NOTE_BLOCK_XYLOPHONE.parseSounds();
+						    Sound sound= XSounds.BLOCK_NOTE_BLOCK_XYLOPHONE.parseSound();
 					        player.playSound(player.getLocation(), sound, 5.0f, 1.0f);
 
 		    }
@@ -294,30 +319,42 @@ public class createItem extends ItemStack{
     i.setItem(31,getGuide());
     i.setItem(35,getConfigItem());
     i.setItem(33,getShow());
-    Sound sound= Sound.BLOCK_CHEST_CLOSE;
+    Sound sound= XSounds.BLOCK_CHEST_CLOSE.parseSound();
     player.playSound(player.getLocation(), sound, 3.0f, 1.0f);
     }
+	private static boolean hasItem(Player player,ItemStack item) {
+		try {
+		if( player.getInventory().getItemInMainHand().equals(item)
+				|| player.getInventory().getItemInOffHand().equals(item) ) {
+              return true;
+				}
+		} catch(NoSuchMethodError error) {
+			if(player.getInventory().getItemInHand().equals(item)) {
+				return true;
+			}else {
+				return false;
+			}
+		}
+		return false;
+	}
 	public static void rightClick(Player player,PlayerInteractEvent e) {
-		if( player.getInventory().getItemInMainHand().equals(eye)
-				|| player.getInventory().getItemInOffHand().equals(eye) ) {
+		if( hasItem(player,eye) ) {
 			        e.setCancelled(true);
 					createItem.teleportMethod(player);
 
 				}
-				if( player.getInventory().getItemInMainHand().equals(dye)
-						|| player.getInventory().getItemInOffHand().equals(dye) ) {
+				if( hasItem(player,dye) ) {
 					if(!player.hasPermission("mp.item.use")) {
 			    		player.sendMessage(ChatColor.YELLOW+"[ERROR] "+ChatColor.GRAY+"You don't have enough permissions.   (permission: mp.item.use)");
 			    		return;
 			    		}
 					LocationMethod.saveLocation(player);
 	                player.sendMessage("Checkpoint was registered.");
-	                Sound sound= XSounds.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON.parseSounds();
+	                Sound sound= XSounds.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON.parseSound();
 	                player.playSound(player.getLocation(), sound, 3.0f, 0.5f);
 	                e.setCancelled(true);
 				}
-				if( player.getInventory().getItemInMainHand().equals(creator)
-						|| player.getInventory().getItemInOffHand().equals(creator) ) {
+				if( hasItem(player,creator) ) {
 					if(!player.hasPermission("mp.item.use")) {
 			    		player.sendMessage(ChatColor.YELLOW+"[ERROR] "+ChatColor.GRAY+"You don't have enough permissions.   (permission: mp.item.use)");
 			    		return;
@@ -329,27 +366,24 @@ public class createItem extends ItemStack{
 					 customInventory.setItem(8, close);
 					 player.openInventory(customInventory);
 				}
-				if( player.getInventory().getItemInMainHand().equals(quit)
-						|| player.getInventory().getItemInOffHand().equals(quit) ) {
+				if( hasItem(player,quit) ) {
 					createItem.quidMethod(player);
 					 e.setCancelled(true);
 	                return;
 
 				}
-				if( player.getInventory().getItemInMainHand().equals(Up)
-						|| player.getInventory().getItemInOffHand().equals(Up) ) {
+				if( hasItem(player,Up) ) {
 					createItem.hideItemMethod(player);
+					player.updateInventory();
 	     	        e.setCancelled(true);
 	     	     return;
 				}
-				if( player.getInventory().getItemInMainHand().equals(guide)
-						|| player.getInventory().getItemInOffHand().equals(guide) ) {
+				if( hasItem(player,guide) ) {
 					createItem.guideMethod(player);
 	     	        e.setCancelled(true);
 	     	     return;
 				}
-				if( player.getInventory().getItemInMainHand().equals(config)
-						|| player.getInventory().getItemInOffHand().equals(config) ) {
+				if( hasItem(player,config) ) {
 					Inventory customInventory = Bukkit.createInventory(null, 9,"Config");
 					customInventory.setItem(8, close);
 					player.openInventory(customInventory);

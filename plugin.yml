@@ -1,6 +1,6 @@
 name:  MinecraftP
 main:  main.MinecraftP
-version:  0.32
+version:  0.33
 api-version: 1.13
 author:  Mituhashi
 commands:

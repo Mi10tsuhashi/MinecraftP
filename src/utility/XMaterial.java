@@ -23,7 +23,7 @@ public enum XMaterial {
      LIGHT_WEIGHTED_PRESSURE_PLATE(0, "GOLD_PLATE"),
      LIME_WOOL(5, "WOOL"),
 	 RED_WOOL(14, "WOOL"),
-	 ROSE_RED(1, "INK_SACK","RED_DYE"),//1.14 非互換
+	 ROSE_RED(1, "INK_SACK","RED_DYE"),
 	 //parseItem only
 	 SIGN(0,"OAK_SIGN","SPRUCE_SIGN","BIRCH_SIGN","JUNGLE_SIGN","ACACIA_SIGN","DARK_OAK_SIGN"),
 	 //Material only
