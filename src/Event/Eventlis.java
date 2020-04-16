@@ -420,7 +420,7 @@ public class Eventlis implements Listener{
 				 if(player.getInventory().contains(checkpoint)) {player.closeInventory();
 	             e.setCancelled(true);
 	             return;}
-				 player.getInventory().addItem(checkpoint);
+				 InventoryMethod.addOneItem(player, checkpoint, createItem.getSignMeta());
 				 player.closeInventory();
 	             e.setCancelled(true);
 			 }

@@ -1,5 +1,7 @@
 package utility;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,12 +13,10 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffectType;
@@ -43,35 +43,40 @@ public class createItem extends ItemStack{
     static ItemStack checkpoint = createItem.getSign();
     static ItemStack config = createItem.getConfigItem();
     static ItemStack close = createItem.getClose();
-	 public static ItemStack getSign() {
-		 ItemStack signItem = new ItemStack(XMaterial.SIGN.parseItem());
-		 BlockStateMeta meta =(BlockStateMeta) signItem.getItemMeta();
-		 Sign sign = (Sign) meta.getBlockState();
-		 sign.setLine(0, ChatColor.GREEN+"["+ChatColor.GOLD+"CheckPoint"+ChatColor.GREEN+"]");
-		 try {
-		 sign.update();
-		 }catch(IllegalStateException e) {
-			 //Code using nms and craftbukkit
-			 //Called in version 1.11 or lower
-			 //works with 1.9.x~1.11.x not working with 1.8.x
+     public static ItemMeta getSignMeta() {
+    	 ItemStack signItem = getSign();
+    	 ItemMeta meta = signItem.getItemMeta();
+    	 String[] line = { ChatColor.GREEN+"["+ChatColor.GOLD+"CheckPoint"+ChatColor.GREEN+"]","","",""};
 			 try {
                 final String VERSION =Bukkit.getServer().getClass().getPackage().getName().substring(23);
 				Class<?> craftSign = Class.forName("org.bukkit.craftbukkit."+VERSION+".block"+".CraftSign");
 				Method sanitizeLines = craftSign.getMethod("sanitizeLines", String[].class);
-				Object newLines = sanitizeLines.invoke(null,new Object[] { sign.getLines()});
-				Method getTileEntity =craftSign.getMethod("getTileEntity");
+				Object newLines = sanitizeLines.invoke(null,new Object[] { line});
 				Class<?> tileE = Class.forName("net.minecraft.server."+VERSION+".TileEntitySign");
-				Object lines = tileE.getField("lines").get(getTileEntity.invoke(sign));
+				Object tileSign =tileE.newInstance();
+				Object lines = tileE.getField("lines").get(tileSign);
 				System.arraycopy(newLines, 0, lines, 0, 4);
-				tileE.getMethod("update").invoke(getTileEntity.invoke(sign));
-			}catch(NoSuchMethodException e2){
-				e2.printStackTrace();
+				Method save = null;
+				Class<?> ItemMeta = null;
+				Class<?> NBTTagCompound = Class.forName("net.minecraft.server."+VERSION+".NBTTagCompound");
+				if(VERSION.startsWith("v1_8")) {
+					save = tileE.getMethod("b", NBTTagCompound);
+					ItemMeta = Class.forName("org.bukkit.craftbukkit."+VERSION+".inventory.CraftMetaTileEntity");
+				}else {
+					save = tileE.getMethod("save", NBTTagCompound);
+					ItemMeta = Class.forName("org.bukkit.craftbukkit."+VERSION+".inventory.CraftMetaBlockState");
+				}
+                Field blockEntityTag =  ItemMeta.getDeclaredField("blockEntityTag");
+                blockEntityTag.setAccessible(true);
+                blockEntityTag.set(meta, NBTTagCompound.newInstance());
+                Object nbt = blockEntityTag.get(meta);
+                save.invoke(tileSign, nbt);
+			}catch(InvocationTargetException e2){
+				e2.getCause().printStackTrace();
 			}
 			 catch (Exception e3) {
 				e3.printStackTrace();
 			}
-		 }
-		 meta.setBlockState(sign);
 		 meta.setDisplayName(ChatColor.GOLD+"CheckPoint");
 		 List<String> list = new ArrayList<String>();
 			String lores0 = ChatColor.BLUE+"It is a sign for";
@@ -79,7 +84,11 @@ public class createItem extends ItemStack{
 			list.add(0,lores0);
 			list.add(1,lores1);
 			meta.setLore(list);
-		 signItem.setItemMeta(meta);
+			return meta;
+     }
+	 public static ItemStack getSign() {
+		 ItemStack signItem = new ItemStack(XMaterial.SIGN.parseItem());
+
 		 return signItem;
 	 }
 	 public static ItemStack getClose() {
@@ -391,6 +400,7 @@ public class createItem extends ItemStack{
 	                return;
 
 				}
+
 	}
 
 

@@ -1,17 +1,20 @@
 package utility;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import main.MinecraftP;
 
 public class InventoryMethod {
-
+    static final String VERSION = Bukkit.getServer().getClass().getPackage().getName().substring(23);
 	static MinecraftP plugin;
 	public InventoryMethod(MinecraftP instance) {
         plugin = instance;
@@ -71,5 +74,48 @@ public class InventoryMethod {
          player.getInventory().setItem(8,createItem.getConfigItem());
          player.getInventory().setItem(6,createItem.getUp());
 	}
+   public static void   addOneItem(Player player ,ItemStack item, ItemMeta meta){
+       try {
+       Class<?> CraftInventory = Class.forName("org.bukkit.craftbukkit."+VERSION+".inventory.CraftInventory");
+       Method firstEmpty = CraftInventory.getMethod("firstEmpty");
+       int index = (int)firstEmpty.invoke(player.getInventory());
+       if(index == -1) {return;}
+       setItem(player,index,item,meta);
+       }catch(Exception e) {e.printStackTrace();}
+
+   }
+   public static void setItem(Player player ,int index, ItemStack item,ItemMeta meta) {
+	   try {
+	   Class<?> CraftInventory = Class.forName("org.bukkit.craftbukkit."+VERSION+".inventory.CraftInventory");
+       Method getIInventory=CraftInventory.getMethod("getInventory");
+       Object IInventoryOBJ =getIInventory.invoke(player.getInventory());
+       Class<?> IInventory = Class.forName("net.minecraft.server."+VERSION+".IInventory");
+       Class<?> NMSitemstack = Class.forName("net.minecraft.server."+VERSION+".ItemStack");
+       Method setItem = IInventory.getMethod("setItem", int.class,NMSitemstack);
+       setItem.setAccessible(true);
+       Object stack= asNMScopy(item,meta);
+       setItem.invoke(IInventoryOBJ, index,stack);
+	   }catch(Exception e) {e.printStackTrace();}
+   }
+   public static Object asNMScopy(ItemStack stack ,ItemMeta itemmeta) {
+	   try {
+	   Class<?> CraftMagicNumbers = Class.forName("org.bukkit.craftbukkit."+VERSION+".util.CraftMagicNumbers");
+	   Object item = CraftMagicNumbers.getMethod("getItem", org.bukkit.Material.class).invoke(null, stack.getType());
+	   Class<?> NMSitemstack = Class.forName("net.minecraft.server."+VERSION+".ItemStack");
+	   Class<?> Item = Class.forName("net.minecraft.server."+VERSION+".Item");
+	   Object nmsStack =NMSitemstack.getConstructor(Item,int.class,int.class).newInstance(item,stack.getAmount(),stack.getDurability());
+	   Class<?> NBTTagCompound = Class.forName("net.minecraft.server."+VERSION+".NBTTagCompound");
+	   Object nbt =NBTTagCompound.newInstance();
+	   Method setTag = NMSitemstack.getMethod("setTag", NBTTagCompound);
+	   setTag.invoke(nmsStack, nbt);
+	   Class<?> CraftMetaItem = Class.forName("org.bukkit.craftbukkit."+VERSION+".inventory.CraftMetaItem");
+	   Method applyToItem = CraftMetaItem.getDeclaredMethod("applyToItem", NBTTagCompound);
+	   applyToItem.setAccessible(true);
+	   applyToItem.invoke(itemmeta, nbt);
+	   return nmsStack;
+	   }catch(Exception e) {e.printStackTrace();}
+	   return null;
+   }
+
 
 }

@@ -1,12 +1,12 @@
 package command;
 
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import utility.InventoryMethod;
 import utility.createItem;
 
 public class WantCommand implements CommandExecutor {
@@ -56,7 +56,7 @@ public class WantCommand implements CommandExecutor {
 	    	player.getInventory().addItem(createItem.getShow());
 	    	break;
 	    case "cp":
-	    	player.getInventory().addItem(createItem.getSign());
+	    	InventoryMethod.addOneItem(player, createItem.getSign(), createItem.getSignMeta());
 	    	break;
 	    default:
 	    	player.sendMessage(ChatColor.YELLOW+"[ERROR] "+ChatColor.GRAY+"Invalid argument.");
