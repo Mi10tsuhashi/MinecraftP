@@ -100,10 +100,21 @@ public class InventoryMethod {
    public static Object asNMScopy(ItemStack stack ,ItemMeta itemmeta) {
 	   try {
 	   Class<?> CraftMagicNumbers = Class.forName("org.bukkit.craftbukkit."+VERSION+".util.CraftMagicNumbers");
-	   Object item = CraftMagicNumbers.getMethod("getItem", org.bukkit.Material.class).invoke(null, stack.getType());
+	   Object item;
+	   if(XMaterial.isLessThan1_12()) {
+	   item = CraftMagicNumbers.getMethod("getItem", org.bukkit.Material.class).invoke(null, stack.getType());
+	   }else {
+		   item = CraftMagicNumbers.getMethod("getItem", org.bukkit.Material.class,short.class).invoke(null, stack.getType(),stack.getDurability());
+	   }
 	   Class<?> NMSitemstack = Class.forName("net.minecraft.server."+VERSION+".ItemStack");
 	   Class<?> Item = Class.forName("net.minecraft.server."+VERSION+".Item");
-	   Object nmsStack =NMSitemstack.getConstructor(Item,int.class,int.class).newInstance(item,stack.getAmount(),stack.getDurability());
+	   Object nmsStack;
+	   if(XMaterial.isLessThan1_12()) {
+	   nmsStack =NMSitemstack.getConstructor(Item,int.class,int.class).newInstance(item,stack.getAmount(),stack.getDurability());
+	   }else {
+		   Class<?> IMaterial = Class.forName("net.minecraft.server."+VERSION+".IMaterial");
+		   nmsStack =NMSitemstack.getConstructor(IMaterial,int.class).newInstance(item,stack.getAmount());
+	   }
 	   Class<?> NBTTagCompound = Class.forName("net.minecraft.server."+VERSION+".NBTTagCompound");
 	   Object nbt =NBTTagCompound.newInstance();
 	   Method setTag = NMSitemstack.getMethod("setTag", NBTTagCompound);
