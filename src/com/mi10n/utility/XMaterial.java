@@ -1,4 +1,4 @@
-package utility;
+package com.mi10n.utility;
 
 
 
@@ -19,6 +19,7 @@ public enum XMaterial {
      GHAST_TEAR(0, "GHAST_TEAR"),
      GOLD_BLOCK(0, "GOLD_BLOCK"),
      GRAY_DYE(8, "INK_SACK"),
+     LIME_DYE(10,"INK_SACK"),
      HEAVY_WEIGHTED_PRESSURE_PLATE(0, "IRON_PLATE"),
      LIGHT_WEIGHTED_PRESSURE_PLATE(0, "GOLD_PLATE"),
      LIME_WOOL(5, "WOOL"),

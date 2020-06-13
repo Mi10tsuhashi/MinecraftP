@@ -1,11 +1,10 @@
-package utility;
+package com.mi10n.utility;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -19,10 +18,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import main.MinecraftP;
+import com.mi10n.main.MinecraftP;
 
 
 
@@ -31,11 +31,11 @@ public class createItem extends ItemStack{
 	static MinecraftP plugin;
 	public createItem(MinecraftP instance) {
 		plugin = instance;
-    }
+	}
 	static ItemStack eye = createItem.getTeleporter();
 	static ItemStack dye = createItem.getRegister();
 	static ItemStack creator = createItem.getCeator();
-	static ItemStack start = createItem.getStart();
+	static ItemStack start = createItem.getStart(null);
 	static ItemStack goal = createItem.getGoal();
 	static ItemStack quit = createItem.getQuit();
     static ItemStack Up = createItem.getUp();
@@ -43,6 +43,19 @@ public class createItem extends ItemStack{
     static ItemStack checkpoint = createItem.getSign();
     static ItemStack config = createItem.getConfigItem();
     static ItemStack close = createItem.getClose();
+    @SuppressWarnings("unchecked")
+	public static boolean isEnable(Player player,ItemStack item) {
+    	if(!player.hasMetadata("disableItem")) { return true;}
+    	List<MetadataValue> meta =player.getMetadata("disableItem");
+    	for(MetadataValue m : meta) {
+    		if(m.getOwningPlugin().equals(plugin)) {
+    		ArrayList<ItemStack> disableitems = (ArrayList<ItemStack>) ((FixedMetadataValue)m).value();
+    			if(disableitems.contains(item)) {return false;}
+    		}
+
+    	}
+    	return true;
+    }
      public static ItemMeta getSignMeta() {
     	 ItemStack signItem = getSign();
     	 ItemMeta meta = signItem.getItemMeta();
@@ -61,7 +74,11 @@ public class createItem extends ItemStack{
 				Class<?> NBTTagCompound = Class.forName("net.minecraft.server."+VERSION+".NBTTagCompound");
 				if(VERSION.startsWith("v1_8")) {
 					save = tileE.getMethod("b", NBTTagCompound);
+					if(VERSION.startsWith("v1_8_R1")) {
 					ItemMeta = Class.forName("org.bukkit.craftbukkit."+VERSION+".inventory.CraftMetaTileEntity");
+					}else {
+						ItemMeta = Class.forName("org.bukkit.craftbukkit."+VERSION+".inventory.CraftMetaBlockState");
+					}
 				}else {
 					save = tileE.getMethod("save", NBTTagCompound);
 					ItemMeta = Class.forName("org.bukkit.craftbukkit."+VERSION+".inventory.CraftMetaBlockState");
@@ -109,6 +126,28 @@ public class createItem extends ItemStack{
 			creator.setItemMeta(meta);
     	 return creator;
      }
+     public static ItemStack getToggleOff() {
+           ItemStack off = new ItemStack(XMaterial.LIME_DYE.parseItem());
+           ItemMeta meta = creator.getItemMeta();
+   	    meta.setDisplayName(ChatColor.GOLD+"Toggle disable");
+           List<String> lorelist = new ArrayList<String>();
+			String lore0 = ChatColor.BLUE+"Enable now";
+			lorelist.add(0,lore0);
+			meta.setLore(lorelist);
+			off.setItemMeta(meta);
+   	 return off;
+     }
+     public static ItemStack getToggleOn() {
+         ItemStack on = new ItemStack(XMaterial.GRAY_DYE.parseItem());
+         ItemMeta meta = creator.getItemMeta();
+ 	    meta.setDisplayName(ChatColor.GOLD+"Toggle enable");
+         List<String> lorelist = new ArrayList<String>();
+			String lore0 = ChatColor.BLUE+"disable now";
+			lorelist.add(0,lore0);
+			meta.setLore(lorelist);
+			on.setItemMeta(meta);
+ 	 return on;
+   }
      public static ItemStack getTeleporter() {
     	    ItemStack eye = new ItemStack(XMaterial.ENDER_EYE.parseItem());
     	    ItemMeta Meta = eye.getItemMeta();
@@ -135,7 +174,7 @@ public class createItem extends ItemStack{
 			dye.setItemMeta(Meta);
     	    return dye;
      }
-     public static ItemStack getStart()  {
+     public static ItemStack getStart(String name)  {
  	    ItemStack start = new ItemStack(XMaterial.LIME_WOOL.parseItem());
  	    ItemMeta meta = start.getItemMeta();
  	     meta.setDisplayName(ChatColor.GOLD+"Set start");
@@ -143,6 +182,10 @@ public class createItem extends ItemStack{
 			String lore0 = ChatColor.BLUE+"Right clicking, set start";
 			String lore1 = ChatColor.BLUE+"spot of parkours.";
 			lorelist.add(0,lore0); lorelist.add(1,lore1);
+			if(name != null) {
+				String lore2 = ChatColor.BLUE+"ParkourName:"+name;
+				lorelist.add(2, lore2);
+				}
 			meta.setLore(lorelist);
 			start.setItemMeta(meta);
  	 return start;
@@ -212,7 +255,7 @@ public class createItem extends ItemStack{
    	 show.setItemMeta(meta);
    	 return show;
     }
-	public static void quidMethod(Player player) {
+	public static void quitMethod(Player player) {
 
 		if(!player.hasPermission("mp.item.use")) {
     		player.sendMessage(ChatColor.YELLOW+"[ERROR] "+ChatColor.GRAY+"You don't have enough permissions.   (permission: mp.item.use)");
@@ -225,6 +268,11 @@ public class createItem extends ItemStack{
             player.playSound(player.getLocation(), sound, 3.0f, 0.5f);
 			return;
 		}
+		 String name =plugin.getParkourConfig().getString(uuid+".parkour");
+         if(name!=null) {
+         	plugin.getParkourConfig().set(uuid+".parkour",null);
+         } else {name = "";}
+	    	plugin.saveParkourConfig();
 		InventoryMethod.InventoryLoad(player);
         plugin.getParkourConfig().set("isPlaying."+uuid, false);
     	plugin.saveParkourConfig();
@@ -243,6 +291,15 @@ public class createItem extends ItemStack{
 	        }, 10L);
         return;
 	}
+	public static String getParkourName(ItemStack item) {
+		List<String> lore = item.getItemMeta().getLore();
+		if(lore.size()<3) {return null;}
+		String parkourname = lore.get(2);
+		if(parkourname!=null&&parkourname.split(":").length>1) {
+			return parkourname.split(":")[1].trim().substring(2);
+		}
+		return null;
+	}
 	public static void guideMethod(Player player) {
 		if(!player.hasPermission("mp.item.use")) {
     		player.sendMessage(ChatColor.YELLOW+"[ERROR] "+ChatColor.GRAY+"You don't have enough permissions.   (permission: mp.item.use)");
@@ -258,26 +315,9 @@ public class createItem extends ItemStack{
     	Long goalTime = System.currentTimeMillis();
     	Long startTime = plugin.getParkourConfig().getLong(uuid+".millis");
     	Long Time = goalTime - startTime;
-	        Long day = TimeUnit.MILLISECONDS.toDays(Time);
-	        Time -= TimeUnit.DAYS.toMillis(day);
-	        Long hours = TimeUnit.MILLISECONDS.toHours(Time);
-	        Time -= TimeUnit.HOURS.toMillis(hours);
-	        Long minutes = TimeUnit.MILLISECONDS.toMinutes(Time);
-	        Time -= TimeUnit.MINUTES.toMillis(minutes);
-	        Long seconds = TimeUnit.MILLISECONDS.toSeconds(Time);
-	        Time -= TimeUnit.SECONDS.toMillis(seconds);
-	        if(day!=0) {
-	        player.sendMessage(ChatColor.GRAY+""+day+"d, "+hours+"h, "+minutes+"m, "+seconds+"."+Time+"s");
-	        }
-	       if(day==0&&hours!=0) {
-	        player.sendMessage(ChatColor.GRAY+""+hours+"h, "+minutes+"m, "+seconds+"."+Time+"s");
-	        }
-	      if(day==0&&hours==0&&minutes!=0) {
-	        player.sendMessage(ChatColor.GRAY+""+minutes+"m, "+seconds+"."+Time+"s");
-	        }
-	     if(day==0&&hours==0&&minutes==0) {
-	        player.sendMessage(ChatColor.GRAY+""+seconds+"."+Time+"s");
-	        }
+
+	        player.sendMessage(ChatColor.GRAY+com.mi10n.utility.Time.format(Time));
+
 	    Sound sound= XSounds.BLOCK_NOTE_BLOCK_GUITAR.parseSound();
         player.playSound(player.getLocation(), sound, 3.0f, 2.0f);
 	}
@@ -349,10 +389,12 @@ public class createItem extends ItemStack{
 	public static void rightClick(Player player,PlayerInteractEvent e) {
 		if( hasItem(player,eye) ) {
 			        e.setCancelled(true);
+			        if(createItem.isEnable(player, eye)){
 					createItem.teleportMethod(player);
+			        }
 
 				}
-				if( hasItem(player,dye) ) {
+				if( hasItem(player,dye)) {
 					if(!player.hasPermission("mp.item.use")) {
 			    		player.sendMessage(ChatColor.YELLOW+"[ERROR] "+ChatColor.GRAY+"You don't have enough permissions.   (permission: mp.item.use)");
 			    		return;
@@ -376,24 +418,65 @@ public class createItem extends ItemStack{
 					 player.openInventory(customInventory);
 				}
 				if( hasItem(player,quit) ) {
-					createItem.quidMethod(player);
+					if(createItem.isEnable(player, quit)) {
+					createItem.quitMethod(player);
+					}
 					 e.setCancelled(true);
 	                return;
 
 				}
-				if( hasItem(player,Up) ) {
+				if( hasItem(player,Up))  {
+					if(createItem.isEnable(player, Up)) {
 					createItem.hideItemMethod(player);
 					player.updateInventory();
+					}
 	     	        e.setCancelled(true);
 	     	     return;
 				}
 				if( hasItem(player,guide) ) {
+					if(createItem.isEnable(player, guide)) {
 					createItem.guideMethod(player);
+					}
 	     	        e.setCancelled(true);
 	     	     return;
 				}
 				if( hasItem(player,config) ) {
-					Inventory customInventory = Bukkit.createInventory(null, 9,"Config");
+					Inventory customInventory = Bukkit.createInventory(null, 36,"Config");
+					customInventory.setItem(9, eye);
+					if(createItem.isEnable(player, eye)) {
+						customInventory.setItem(18, createItem.getToggleOff());
+						} else {
+							customInventory.setItem(18, createItem.getToggleOn());
+						}
+
+
+					customInventory.setItem(11, quit);
+					if(createItem.isEnable(player, quit)) {
+					customInventory.setItem(20, createItem.getToggleOff());
+					} else {
+						customInventory.setItem(20, createItem.getToggleOn());
+					}
+
+					customInventory.setItem(13, guide);
+					if(createItem.isEnable(player, guide)) {
+					customInventory.setItem(22, createItem.getToggleOff());
+					} else {
+						customInventory.setItem(22, createItem.getToggleOn());
+					}
+
+					customInventory.setItem(15, createItem.getShow());
+					if(createItem.isEnable(player, createItem.getShow())) {
+					customInventory.setItem(24, createItem.getToggleOff());
+					} else {
+						customInventory.setItem(24, createItem.getToggleOn());
+					}
+
+					customInventory.setItem(17, Up);
+					if(createItem.isEnable(player, Up)) {
+					customInventory.setItem(26, createItem.getToggleOff());
+					} else {
+						customInventory.setItem(26, createItem.getToggleOn());
+					}
 					customInventory.setItem(8, close);
 					player.openInventory(customInventory);
 					 e.setCancelled(true);

@@ -1,4 +1,4 @@
-package command;
+package com.mi10n.commands;
 
 
 
@@ -10,8 +10,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import main.MinecraftP;
-import utility.LocationMethod;
+import com.mi10n.main.MinecraftP;
+import com.mi10n.utility.LocationMethod;
 
 public class LocationCommand implements CommandExecutor  {
 

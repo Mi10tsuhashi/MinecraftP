@@ -1,9 +1,9 @@
-package Event;
+package com.mi10n.Enents;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -30,19 +30,23 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import com.google.common.collect.Sets;
+import com.mi10n.main.MinecraftP;
+import com.mi10n.utility.InventoryMethod;
+import com.mi10n.utility.LocationMethod;
+import com.mi10n.utility.XMaterial;
+import com.mi10n.utility.XSounds;
+import com.mi10n.utility.createItem;
 
-import main.MinecraftP;
-import utility.InventoryMethod;
-import utility.LocationMethod;
-import utility.XMaterial;
-import utility.XSounds;
-import utility.createItem;
+import net.wesjd.anvilgui.AnvilGUI;
+
 
 
 
@@ -153,6 +157,8 @@ public class Eventlis implements Listener{
     	    String uuid = player.getUniqueId().toString();
     	    if(plugin.getParkourConfig().getStringList("start").contains("("+X+")("+Y+")("+Z+")")){
     	    	if(plugin.getParkourConfig().getBoolean("isPlaying."+uuid)) {return;}
+    	    	String corr = "("+X+")("+Y+")("+Z+")";
+    	    	corr = corr.replace(".", "-");
                  plugin.getParkourConfig().set("isPlaying."+uuid, true);
                  plugin.saveParkourConfig();
                  InventoryMethod.InventorySave(player);
@@ -160,6 +166,12 @@ public class Eventlis implements Listener{
                  InventoryMethod.SetStartItem(player);
  				 String pN = player.getName();
  				 LocationMethod.saveLocation(player);
+ 				String name =plugin.getParkourConfig().getString(corr);
+                 if(name!=null) {
+                	 plugin.getParkourConfig().set(uuid+".parkour",name);
+                 } else {
+                	 plugin.getParkourConfig().set(uuid+".parkour",null);
+                 }
  				 plugin.getParkourConfig().set(uuid+".millis",System.currentTimeMillis());
  				 plugin.getParkourConfig().set(uuid+".Name",pN);
  				 plugin.saveParkourConfig();
@@ -170,39 +182,33 @@ public class Eventlis implements Listener{
     	    	if(!plugin.getParkourConfig().getBoolean("isPlaying."+uuid)) {return;}
     	    	InventoryMethod.InventoryLoad(player);
                 plugin.getParkourConfig().set("isPlaying."+uuid, false);
+                String name =plugin.getParkourConfig().getString(uuid+".parkour");
+                String pn = player.getName();
+    	    	long goalTime = System.currentTimeMillis();
+    	    	long startTime = plugin.getParkourConfig().getLong(uuid+".millis");
+    	    	long Time = goalTime - startTime;
+    	    	String formatname;
+                if(name!=null) {
+                	formatname = " "+name+" ";
+                	plugin.getParkourConfig().set(uuid+".parkour",null);
+                } else {formatname = " ";}
     	    	plugin.saveParkourConfig();
-    	    	String pn = player.getName();
-    	    	Long goalTime = System.currentTimeMillis();
-    	    	Long startTime = plugin.getParkourConfig().getLong(uuid+".millis");
-    	    	Long Time = goalTime - startTime;
-     	        Long day = TimeUnit.MILLISECONDS.toDays(Time);
-     	        Time -= TimeUnit.DAYS.toMillis(day);
-     	        Long hours = TimeUnit.MILLISECONDS.toHours(Time);
-     	        Time -= TimeUnit.HOURS.toMillis(hours);
-     	        Long minutes = TimeUnit.MILLISECONDS.toMinutes(Time);
-     	        Time -= TimeUnit.MINUTES.toMillis(minutes);
-     	        Long seconds = TimeUnit.MILLISECONDS.toSeconds(Time);
-     	        Time -= TimeUnit.SECONDS.toMillis(seconds);
-     	        if(day!=0) {
-     	        Bukkit.broadcastMessage(ChatColor.AQUA+""+pn+" cleared Parkour! "
-     	        		+ChatColor.GRAY+""+day+"d, "+hours+"h, "+minutes+"m, "+seconds+"."+Time+"s");
-     	        }
-     	       if(day==0&&hours!=0) {
-     	    	  Bukkit.broadcastMessage(ChatColor.AQUA+""+pn+" cleared Parkour! "
-         	        		+ChatColor.GRAY+""+hours+"h, "+minutes+"m, "+seconds+"."+Time+"s");
-        	        }
-     	      if(day==0&&hours==0&&minutes!=0) {
-     	    	 Bukkit.broadcastMessage(ChatColor.AQUA+""+pn+" cleared Parkour! "
-     	        		+ChatColor.GRAY+""+minutes+"m, "+seconds+"."+Time+"s");
-       	        }
-     	     if(day==0&&hours==0&&minutes==0) {
-     	    	 Bukkit.broadcastMessage(ChatColor.AQUA+""+pn+" cleared Parkour! "
-         	        		+ChatColor.GRAY+""+seconds+"."+Time+"s");
-        	        }
+
+     	    	 Bukkit.broadcastMessage(ChatColor.AQUA+""+pn+" cleared"+formatname+"Parkour! "
+         	        		+ChatColor.GRAY+com.mi10n.utility.Time.format(Time));
+                if(name!=null) {
+                	 if(plugin.getDatabase().isBest(player, name, Time)&&plugin.getDatabase().getBest(player, name)>0) {
+                     	plugin.getDatabase().updateTime(player, plugin.getDatabase().getCourseId(name), Time);
+                     	player.sendMessage(ChatColor.GRAY+"this is best!");
+                     }else if(plugin.getDatabase().getBest(player, name)<0){
+                     	plugin.getDatabase().insertTime(player, plugin.getDatabase().getCourseId(name), Time);
+                     	player.sendMessage(ChatColor.GRAY+"this is first record.");
+                     } else {
+                     	player.sendMessage(ChatColor.GRAY+"your best is: "+com.mi10n.utility.Time.format(plugin.getDatabase().getBest(player, name)));
+                     }
+                }
      	        player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
      	        player.removePotionEffect(PotionEffectType.SATURATION);
-
-
     	    	BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
     	        scheduler.scheduleSyncDelayedTask(plugin, new Runnable() {
     	            @Override
@@ -250,12 +256,31 @@ public class Eventlis implements Listener{
 	    	List<String> l = plugin.getParkourConfig().getStringList("start");
 	    	l.remove("("+X+")("+Y+")("+Z+")");
 	    	plugin.getParkourConfig().set("start", l);
+	    	String corr = "("+X+")("+Y+")("+Z+")";
+	    	corr = corr.replace(".", "-");
+	    	String name = plugin.getParkourConfig().getString(corr);
+	    	plugin.getParkourConfig().set(corr,null);
 	    	plugin.saveParkourConfig();
+	    	//TODO
+	    	boolean notdelete = false;
+	    	Set<String> parents = plugin.getParkourConfig().getKeys(false);
+	    	for(String s : parents) {
+	    		if(s.startsWith("(")) {
+	    			String course = plugin.getParkourConfig().getString(s);
+	    			if(course.equals(name)) {
+	    				notdelete = true;
+	    				break;
+	    			}
+	    		}
+	    	}
+	    	if(!notdelete) {
+	    		plugin.getDatabase().deleteCource(name);
+	    	}
 	    	player.sendMessage("The start spot was broken."+ChatColor.GRAY+" ("+X+") ("+Y+") ("+Z+")");
 	    	return;
 	    }
 	    if((plugin.getParkourConfig().getStringList("start").contains("("+X+")("+Y+")("+Z+")"))
-	    		&&(plugin.getParkourConfig().getStringList("start").contains("("+X+")("+Y+")("+Z+")"))){
+	    		&&(plugin.getParkourConfig().getStringList("goal").contains("("+X+")("+Y+")("+Z+")"))){
 	    	List<String> l = plugin.getParkourConfig().getStringList("goal");
 	    	l.remove("("+X+")("+Y+")("+Z+")");
 	    	plugin.getParkourConfig().set("goal", l);
@@ -285,10 +310,26 @@ public class Eventlis implements Listener{
 		}
 		return false;
 	}
+	private static boolean hasItem(Player player,String name) {
+		try {
+			if(player.getInventory().getItemInMainHand().hasItemMeta()&&player.getInventory().getItemInMainHand().getItemMeta().getDisplayName().equals(name)) {
+				return true;
+			}
+		if(player.getInventory().getItemInOffHand().hasItemMeta()&&player.getInventory().getItemInOffHand().getItemMeta().getDisplayName().equals(name)) {
+              return true;
+				}
+		} catch(NoSuchMethodError error) {
+			if(player.getInventory().getItemInHand().hasItemMeta()&&player.getInventory().getItemInHand().getItemMeta().getDisplayName().equals(name)) {
+				return true;
+			}else {
+				return false;
+			}
+		}
+		return false;
+	}
 	@EventHandler
 	public void BlockPlace(BlockPlaceEvent e) {
 	    Player player =  e.getPlayer();
-	    ItemStack start = createItem.getStart();
 	    ItemStack goal = createItem.getGoal();
 	    Double x = e.getBlock().getLocation().getX();
 	    Double y = e.getBlock().getLocation().getY();
@@ -296,16 +337,35 @@ public class Eventlis implements Listener{
 	    String X = String.valueOf(x);
 	    String Y = String.valueOf(y);
 	    String Z = String.valueOf(z);
-	    if( hasItem(player,start) ) {
+	    if( hasItem(player,ChatColor.GOLD+"Set start") ) {
+	    	String name = createItem.getParkourName(e.getItemInHand());
 	    	if(!player.hasPermission("mp.item.use")) {
 	    		player.sendMessage(ChatColor.YELLOW+"[ERROR] "+ChatColor.GRAY+"You don't have enough permissions.   (permission: mp.item.use)");
 	    		return;
 	    		}
+	    	String corr = "("+X+")("+Y+")("+Z+")";
+	    	corr = corr.replace(".", "-");
 	    	if(plugin.getParkourConfig().getStringList("start").contains("("+X+")("+Y+")("+Z+")")) {
+	    		if(name!=null) {
+
+	    			plugin.getParkourConfig().set(corr, name);
+	    			boolean created = plugin.getDatabase().createCource(name, player);
+		    		 player.sendMessage(String.valueOf(created));
+	    		} else {
+	    			plugin.getDatabase().deleteCource(name);
+	    			plugin.getParkourConfig().set(corr, null);
+	    		}
 	    		e.getBlock().setType(XMaterial.LIGHT_WEIGHTED_PRESSURE_PLATE.parseMaterial());
 	    		player.sendMessage(ChatColor.GRAY+"Start spot was created."+" ("+X+") ("+Y+") ("+Z+")");
 	    		return;
         }
+	    	if(name!=null) {
+	    		plugin.getDatabase().createCource(name, player);
+    			plugin.getParkourConfig().set(corr, name);
+    		} else {
+    			plugin.getDatabase().deleteCource(name);
+    			plugin.getParkourConfig().set(corr, null);
+    		}
 	    	e.getBlock().setType(XMaterial.LIGHT_WEIGHTED_PRESSURE_PLATE.parseMaterial());
 	    	player.sendMessage(ChatColor.GRAY+"Start spot was created."+" ("+X+") ("+Y+") ("+Z+")");
 	    	List<String> l = plugin.getParkourConfig().getStringList("start");
@@ -333,7 +393,7 @@ public class Eventlis implements Listener{
 	}
 	@EventHandler
 	public void InventoryEvent(InventoryClickEvent e) {
-		 ItemStack start = createItem.getStart();
+		 ItemStack start = createItem.getStart(null);
 		 ItemStack goal = createItem.getGoal();
 		 ItemStack checkpoint = createItem.getSign();
 		 ItemStack close = createItem.getClose();
@@ -341,6 +401,7 @@ public class Eventlis implements Listener{
 		 if(e.getCurrentItem()==null) {return;}
 		 if( e.getCurrentItem().equals(createItem.getShow())) {
 			 if(player.getInventory().contains(createItem.getShow())) {
+				 if(createItem.isEnable(player, e.getCurrentItem())) {
 				Inventory i = player.getInventory();
 				    i.remove(createItem.getShow());
 					i.remove(createItem.getTeleporter());
@@ -361,6 +422,7 @@ public class Eventlis implements Listener{
 	    	        Sound sound= XSounds.BLOCK_CHEST_OPEN.parseSound();
 	                player.playSound(player.getLocation(), sound, 3.0f, 1.0f);
 	                player.closeInventory();
+				 }
 		             e.setCancelled(true);
 			 }
 			}
@@ -372,23 +434,31 @@ public class Eventlis implements Listener{
 			  ItemStack hide = createItem.getUp();
 			  ItemStack config = createItem.getConfigItem();
 			 if(e.getCurrentItem().equals(quit)&&player.getInventory().contains(quit)) {
-				 createItem.quidMethod(player);
+				 if(createItem.isEnable(player, e.getCurrentItem())) {
+				 createItem.quitMethod(player);
 				 player.closeInventory();
+				 }
 				 e.setCancelled(true);
 			 }
 			 if(e.getCurrentItem().equals(guide)&&player.getInventory().contains(guide)) {
+				 if(createItem.isEnable(player, e.getCurrentItem())) {
 				 createItem.guideMethod(player);
 				 player.closeInventory();
+				 }
 				 e.setCancelled(true);
 			 }
 			 if(e.getCurrentItem().equals(eye)&&player.getInventory().contains(eye)) {
+				 if(createItem.isEnable(player, e.getCurrentItem())) {
 				 createItem.teleportMethod(player);
 				 player.closeInventory();
+				 }
 				 e.setCancelled(true);
 			 }
 			 if(e.getCurrentItem().equals(hide)&&player.getInventory().contains(hide)) {
+				 if(createItem.isEnable(player, e.getCurrentItem())){
 				 createItem.hideItemMethod(player);
 				 player.closeInventory();
+				 }
 				 e.setCancelled(true);
 			 }
 			 if(e.getCurrentItem().equals(config)&&player.getInventory().contains(config)) {
@@ -435,6 +505,57 @@ public class Eventlis implements Listener{
 				player.closeInventory();
 	            e.setCancelled(true);
 			 }
+
+			 if (e.getCurrentItem().equals(createItem.getToggleOff())){
+				    if(player.hasMetadata("disableItem")) {
+				    	List<MetadataValue>  meta = player.getMetadata("disableItem");
+				    	player.removeMetadata("disableItem", plugin);
+				    	//metaのサイズがゼロ
+				    	for(MetadataValue m : meta) {
+				    		if(m.getOwningPlugin().equals(plugin)) {
+				    			@SuppressWarnings("unchecked")
+								ArrayList<ItemStack> items = (ArrayList<ItemStack>)m.value();
+				    			items.add(e.getInventory().getItem(e.getSlot()-9));
+				    			player.setMetadata("disableItem", new FixedMetadataValue(plugin,items));
+
+
+				    		}
+				    	}
+				    } else {
+				    	ArrayList<ItemStack> items = new ArrayList<>();
+		    			items.add(e.getInventory().getItem(e.getSlot()-9));
+		    			player.setMetadata("disableItem", new FixedMetadataValue(plugin,items));
+
+				    }
+				    e.getInventory().setItem(e.getSlot(), createItem.getToggleOn());
+				    player.updateInventory();
+		            e.setCancelled(true);
+		            return;
+				 }
+			 if (e.getCurrentItem().equals(createItem.getToggleOn())){
+				    if(player.hasMetadata("disableItem")) {
+				    	 if(player.hasMetadata("disableItem")) {
+						    	List<MetadataValue>  meta = player.getMetadata("disableItem");
+						    	for(MetadataValue m : meta) {
+						    		if(m.getOwningPlugin().equals(plugin)) {
+						    			@SuppressWarnings("unchecked")
+										ArrayList<ItemStack> items = (ArrayList<ItemStack>)m.value();
+						    			items.remove(e.getInventory().getItem(e.getSlot()-9));
+						    			player.setMetadata("disableItem", new FixedMetadataValue(plugin,items));
+						    		}
+						    	}
+						    } else {
+						    	ArrayList<ItemStack> items = new ArrayList<>();
+				    			player.setMetadata("disableItem", new FixedMetadataValue(plugin,items));
+						    }
+				    }
+				    e.getInventory().setItem(e.getSlot(), createItem.getToggleOff());
+		            player.updateInventory();
+		            e.setCancelled(true);
+
+		            return;
+				 }
+
            return;
 		 }
 	}
@@ -544,6 +665,43 @@ public class Eventlis implements Listener{
 
 		 }
 	}
+
+	@EventHandler
+	public void leftClick(PlayerInteractEvent e) {
+		Player player = e.getPlayer();
+		if(e.getAction().equals(Action.LEFT_CLICK_BLOCK)||e.getAction().equals(Action.LEFT_CLICK_AIR)) {
+			if(hasItem(player,ChatColor.GOLD+"Set start")) {
+             new AnvilGUI.Builder()
+             .plugin(plugin)
+             .text("Define Parkour Name")
+             .title("Define Parkour Name")
+             .onComplete((editor,text)->{
+            	 ItemMeta meta = e.getItem().getItemMeta();
+         	     meta.setDisplayName(ChatColor.GOLD+"Set start");
+                 List<String> lorelist = new ArrayList<String>();
+        			String lore0 = ChatColor.BLUE+"Right clicking, set start";
+        			String lore1 = ChatColor.BLUE+"spot of parkours.";
+        			lorelist.add(0,lore0); lorelist.add(1,lore1);
+        			if(text != null) {
+        				String lore2 = ChatColor.BLUE+"ParkourName: "+ChatColor.GREEN+text;
+        				lorelist.add(2, lore2);
+        				}
+        			meta.setLore(lorelist);
+        			e.getItem().setItemMeta(meta);
+
+            	 editor.sendMessage(ChatColor.GREEN+"The parkour name has been set to "+ChatColor.YELLOW+text+ChatColor.GREEN+".");
+            	 return AnvilGUI.Response.close();
+            			 })
+             .open(player);
+             e.setCancelled(true);
+
+			}
+
+			return;
+
+		 }
+	}
+
 }
 
 

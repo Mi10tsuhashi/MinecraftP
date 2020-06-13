@@ -1,8 +1,8 @@
-package utility;
+package com.mi10n.utility;
 
 import org.bukkit.entity.Player;
 
-import main.MinecraftP;
+import com.mi10n.main.MinecraftP;
 
 public class LocationMethod {
 

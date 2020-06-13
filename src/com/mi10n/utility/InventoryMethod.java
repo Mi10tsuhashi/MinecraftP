@@ -1,4 +1,4 @@
-package utility;
+package com.mi10n.utility;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -11,7 +11,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import main.MinecraftP;
+import com.mi10n.main.MinecraftP;
 
 public class InventoryMethod {
     static final String VERSION = Bukkit.getServer().getClass().getPackage().getName().substring(23);

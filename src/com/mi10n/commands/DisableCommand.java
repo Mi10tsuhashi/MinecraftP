@@ -1,4 +1,4 @@
-package command;
+package com.mi10n.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -8,7 +8,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import main.MinecraftP;
+import com.mi10n.main.MinecraftP;
 
 
 public class DisableCommand implements CommandExecutor{

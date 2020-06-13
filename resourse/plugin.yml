@@ -1,6 +1,6 @@
 name:  MinecraftP
-main:  main.MinecraftP
-version:  0.35
+main:  com.mi10n.main.MinecraftP
+version:  0.36
 api-version: 1.13
 author:  Mituhashi
 commands:
@@ -13,6 +13,15 @@ commands:
    disable:
        description: disable something...
        usage: /disable
+   rank:
+       description:
+       usage: /record course name
+   mybest:
+       description:
+       usage: /mybest course name
+   course:
+       description:
+       usage: /course list/info
 permissions:
     mp.*:
         description:  give access to all MinecraftP commands and enable use item.
@@ -25,7 +34,7 @@ permissions:
             mp.sign:  true
             mp.disable:  true
             mp.disable.chest:  true
-            mp.disable,join:  true
+            mp.disable.join:  true
     mp.loc.get:   
         description:  give access /loc get command.
         default:  true

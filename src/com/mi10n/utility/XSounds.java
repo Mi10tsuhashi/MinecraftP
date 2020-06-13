@@ -1,4 +1,4 @@
-package utility;
+package com.mi10n.utility;
 
 
 import org.bukkit.Sound;
