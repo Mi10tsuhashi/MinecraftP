@@ -1,0 +1,6 @@
+Host:  localhost
+Port:  3306
+Database:  changethis
+User:  changethis
+Password:  changethis
+Enable:  changethis
