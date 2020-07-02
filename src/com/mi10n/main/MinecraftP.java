@@ -13,7 +13,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.mi10n.Enents.Eventlis;
+import com.mi10n.Events.Eventlis;
 import com.mi10n.commands.DisableCommand;
 import com.mi10n.commands.LocationCommand;
 import com.mi10n.commands.ParkourCommand;

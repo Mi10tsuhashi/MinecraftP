@@ -1,4 +1,4 @@
-package com.mi10n.Enents;
+package com.mi10n.Events;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -261,7 +261,6 @@ public class Eventlis implements Listener{
 	    	String name = plugin.getParkourConfig().getString(corr);
 	    	plugin.getParkourConfig().set(corr,null);
 	    	plugin.saveParkourConfig();
-	    	//TODO
 	    	boolean notdelete = false;
 	    	Set<String> parents = plugin.getParkourConfig().getKeys(false);
 	    	for(String s : parents) {
@@ -510,7 +509,6 @@ public class Eventlis implements Listener{
 				    if(player.hasMetadata("disableItem")) {
 				    	List<MetadataValue>  meta = player.getMetadata("disableItem");
 				    	player.removeMetadata("disableItem", plugin);
-				    	//metaのサイズがゼロ
 				    	for(MetadataValue m : meta) {
 				    		if(m.getOwningPlugin().equals(plugin)) {
 				    			@SuppressWarnings("unchecked")
