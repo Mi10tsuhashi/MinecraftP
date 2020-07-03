@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+
+<html>
+
+<div id="back">
+
+<div id="all">
+
+<head>
+
+<meta charset="UTF-8">
+
+<link rel="stylesheet" href="base.css">
+
+<title>MySQL連携</title>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-164077459-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-164077459-1');
+</script>
+
+</head>
+
+<body>
+<div id="index"><h1 id="title">MySQL連携</h1></div>
+<div id="body">
+<h3>事前準備</h3>
+     <p>事前準備として、タイムを記録するためのデータベースを作成しておく必要があります。また、そのデータベースを使用する権限のあるユーザーとパスワードを確認しておいてください。データベース名には制約はありません。わかりやすい名前で作成してください。</p>
+<h3>sql.ymlの編集</h3>
+    <p>プラグインロード時に生成されたMinecraftPフォルダ内にある、sql.ymlを編集します。sql.ymlの内容はデフォルトで以下のようになっています。</p>
+	<pre style="background-color: #ffffff;">
+    Host:  localhost
+    Port:  3306
+    Database:  changethis
+    User:  changethis
+    Password:  changethis
+    Enable:  changethis
+	</pre>
+	<p>spigotサーバーの動いているコンピュータ上でMySQLサーバーも動かしている場合はlocalhostのままで、もしも他のサーバーで動かしている場合はlocalhostを適切なホスト名に変更してください。PortはMySQLのデフォルトのポートのままであれば3306でOKです。データベース名、ユーザー名、パスワードをそれぞれ入力したことを確認したら、Enable:の値をtrueに書き換えて、リロードか再起動をしてください。うまくいくとコンソールに成功のメッセージが表示されます。</p>
+<h3>webで利用する(編集中)</h3>
+    <p></p>
+　　　　
+</div>
+
+<div id="menu"><ul><a href=index.jsp><li>トップに戻る</li></a>
+                </ul></div>
+
+
+</div>
+
+<div id="footer">
+
+<small>www.mi10n.com All Right Reserved.</small>
+
+                                               </div></div>
+
+                                                   </body>
+
+</html>

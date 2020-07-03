@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<div id="back">
+<div id="all">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="base.css"/>
+<title>MinecraftP Guide</title>
+<link rel="shortcut icon" href="favicon.ico"/>
+<link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-164077459-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-164077459-1');
+</script>
+
+</head>
+<body>
+<div id="index"><h1 id="title">MinecraftP Guide</h1></div> 
+<div id="body">
+<h4>MinecraftPとは</h4>
+<p>運営に扱いやすいプラグインを意識して制作、サポートされているアスレチック作成プラグインです。
+Minecraft Serverのラッパーであるspigotサーバーとpaperサーバーで動作します。
+spigotの対応バージョンは1.8.x ～ 1.16.1です。paperでは#1596でのみ動作確認を行っています。より詳細な扱い方は右側のチュートリアルのリンクから見ることができます。
+デフォルトでSQLiteに、オプションでMySQLにタイムやコースに関わるデータを保存できます。SQLiteを使用する場合は得に設定を弄る必要はありません。MySQLを使うためにはプラグインロード時に
+生成されたMinecraftPフォルダ内にあるsql.ymlファイルを編集してリロードする必要があります。
+<div style="color: gray;">version 0.37の情報を掲載しています。最新バージョンの掲載が遅れていることがあります。最新バージョンであるかはspigotにて確認してください。</div>
+</p>
+<h4>利用規約</h4>
+<p>
+MinecraftPではversion 0.36からAnvilGUIを内部で利用しています。AnvilGUIのパッケージは<a href="https://github.com/WesJD/AnvilGUI/blob/master/LICENSE">AnvilGUIのライセンス</a>に準拠します。
+当プラグインを利用するにあたって利用者の行動を制限するような利用規約は設けていません。改変等、当プラグインを利用して新しく制作物を作る際に、報告の必要はありません。<p> 
+<h4><<ダウンロードとセットアップ>></h4>
+<a href="./Download/MinecraftP-0.37.jar" download="MinecraftP-0.37.jar">このサイトからダウンロード</a>
+&nbsp;&nbsp;
+<a href="https://www.spigotmc.org/resources/minecraftp-1-8-x-1-16-1.63525/">spigotからダウンロード</a>
+
+<p>
+spigot serverもしくはpaper serverのpluginsフォルダ内にDownloadしたMinecraftP.jarを配置してサーバーを起動してください。
+paper serverを使う場合はバージョンが# 1596 以降であることを確認してください。それより前の動作の保証はされません。他のプラグインが無くても基本的な動作はしますが、permissionの管理を柔軟に行いたい場合は好きなpermission管理のプラグインと併用してください。</br>
+</p>
+<h4>ソースコード</h4>
+<p>ソースコードは<a href="https://github.com/Mi10tsuhashi/MinecraftP">こちら</a>から見ることができます。</p>
+<h3 id="cmd">コマンド一覧</h3>
+<table id="table" border="2">
+  <tr>
+      <th>コマンド名</th>
+	  <th>使い方</th>
+  </tr>
+  <tr>
+      <td>/course info/list</td>
+	  <td>引数がinfoまたは指定なしの場合、現在プレイ中のコースのコース名、作者、作成日時を表示します。作成日時はデータベースのタイムスタンプに依存しています。SQLiteでは時差が考慮されていませんが、MySQLでは考慮されています。</br>引数がlistの時は現在作成されているコース名をすべて表示します。</td>
+  </tr>
+  <tr>
+      <td>/rank [parkour name]</td>
+	  <td>指定したコースをプレイしたプレイヤーのMCIDとベストタイムを昇順で表示します。</td>
+  </tr>
+  <tr>
+      <td>/mybest [parkour name]</td>
+	  <td>指定したコース名の自己ベストを表示します。引数を指定しなかった場合は過去にクリアしたベストタイムをすべて表示します。</td>
+  </tr>
+  <tr>
+      <td>/loc get</td>
+	  <td>自分の位置情報を表示します。位置情報はチャット欄にワールド、x,y,z座標がそれぞれ表示されます。他の人には見えません。</td>
+  </tr>
+  <tr>
+      <td>/loc tp</td>
+	  <td>アイテム、看板、/loc saveで保存されたセーブポイントにテレポートします。</td>
+  </tr>
+  <tr>
+       <td>/loc save</td>
+        <td>現在の位置情報をセーブポイントとして保存します。基本的に/loc tpやアイテムと合わせて使うためのものです。</td>	   
+  </tr>
+  <tr>
+       <td>/want アイテム名</td>
+	   <td>このプラグインで使うアイテムを取得するためのコマンドです。アイテム名にはteleporter、register、creator、quit、guide、config、cp、hideitem、showitemがあります。このコマンドは運営用でデフォルトではOP持ちのみが使えます。</td>
+  </tr>
+  <tr>
+     <td>/disable 設定項目　on/off</td>
+	 <td>設定項目にはchestとjoinがあります。chestは現在のワールド内でプレイヤーが開けられないようにします。この項目はチェストの上に水を設置したアスレでプレイヤーがチェストを開けることで水流が発生することを防ぐためのものです。もう一つの項目のjoinはサーバー接続時のメッセージのオンオフです。</td>
+  </tr>
+  </table>
+<h3 id="item">アイテムと使い方</h3>
+<p>基本的にアイテムは右クリックをすることで使うことができます。このプラグインは運営が設置したスタート用の感圧版を踏むとアスレチック用のアイテムが配置されたインベントリに切り替わり、ゴールもしくはQuitアイテムを使うともとのインベントリに戻ります。コマンドからアイテムを取得できるのはデフォルトでは運営のみで、不具合があった時のために用意しているものです。プレイ中のアイテムは捨てることはできませんが、隠すことはできます。</p>
+<table id="table" border="2">
+  <tr>
+      <th>アイテム名</th>
+	  <th>説明</th>
+  </tr>
+  <tr>
+      <td>Teleporter</td>
+      <td>エンダーアイの見た目をしたアイテムです。/loc tpコマンドを実行したときと同じ振る舞いをします。</td>
+  </tr>
+  <tr>
+      <td>Register CheckPoint</td>
+      <td>灰色の粘土の見た目です。/loc saveと同じように振る舞います。</td>	 
+  </tr>
+  <tr>
+      <td>Creator</td>
+      <td>時計の見た目です。このアイテムは運営用で、感圧版を踏んでも配布されません。右クリックでGUIが開きGUI内のアイテムをクリックすることで作成用アイテムを取得できます。</td>
+  </tr>
+  <tr>
+      <td>Quit</td>
+      <td>赤色の粘土の見た目です。プレイ中のゲームアスレチックを抜けてもとのインベントリに切り替わります。運営が/setworldspawn ~ ~1 ~ などのコマンドで設定したスポーン地点にテレポートします。</td>
+  </tr>
+  <tr>
+      <td>Guide</td>
+      <td>本の見た目です。スタートの看板を踏んでからの経過時間を自分にのみ見える形でチャット欄に表示します。</td>
+  </tr>
+  <tr>
+      <td>Config</td>
+      <td>骨の見た目です。パルクールプレイ時に配布されるアイテムの機能の有効、無効を切り替えるためのGUIを表示します。</td>
+  </tr>
+  <tr>
+      <td>HideItem</td>
+      <td>ガストの涙の見た目です。アスレをスタートするとホットバーにアイテムが配置されますが、これらのアイテムをEを押すなどしてインベントリを開かないと見えないように一段上にずらします。</td>
+  </tr>
+  <tr>
+      <td>ShowItem</td>
+      <td>ガストの涙の見た目です。HideItemでずらしたアイテムをもとに戻します。HideItemを使った状態でも左クリックでアイテムは使えます。</td>
+  </tr>
+  <tr>
+      <td>CheckPoint</td>
+      <td>看板の見た目です。CreatorのGUIにあるアイテムでチェックポイント用の看板を配置する用のアイテムです。置かれた看板を右クリックするとセーブポイントが保存されます。</td>
+  </tr>
+  <tr>
+      <td>setGoal</td>
+      <td>CreatorのGUIにあるアイテムでゴール用の感圧版を設置するためのものです。左クリックで名前を付けるためのGUIを開き、右クリックで設置します。スタート地点は複数設置することができ、全ての名前の付いたスタート地点が壊されると、データベースからもそのコースに関わる情報が自動的に削除されます。逆に言うと一つでも同じ名前のスタート地点が残っている限りは削除されません。</td>
+  </tr>
+  <tr>
+      <td>setStart</td>
+      <td>CreatorのGUIにあるアイテムでスタート用の感圧版を設置するためのものです。右クリックで設置し、スタート同様複数設置することができます。</td>
+  </tr>
+  </table>
+<h3 id="per">パーミッション</h3>
+<table id="table" border="2">
+  <tr>
+      <th>コマンド</th>
+	  <th>パーミッション</th>
+  </tr>
+  <tr>
+      <td>loc get</td>
+      <td>mp.loc.get</td>
+  </tr>
+  <tr>
+      <td>loc save</td>
+      <td>mp.loc.save</td>	 
+  </tr>
+  <tr>
+      <td>loc tp</td>
+      <td>mp.loc.tp</td>
+  </tr>
+  <tr>
+      <td>want</td>
+      <td>mp.item</td>
+  </tr>
+  <tr>
+      <td>disable</td>
+      <td>mp.disable</td>
+  </tr>
+  <tr>
+      <td>disable chest</td>
+      <td>mp.disable.chest</td>
+  </tr>
+  <tr>
+      <td>disable join</td>
+      <td>mp.disable.join</td>
+  </tr>
+  </table>
+<h4>他のパーミッション</h4>
+<p>mp.item.use　⇒アイテムを使えるようにするもの    mp.sign ⇒チェックポイント用の看板を置けるかどうか</p>
+<h4>デフォルトの設定</h4>
+<p>OP持ちはすべて使えます。他はアイテムのみ使えます。</p>
+<div id="banner1">
+<a href="https://www.chess.com?ref_id=55535912"><img src="img/Remarketing_728x90.gif"/></a>
+</div>
+
+                             </div>	
+<div id="menu"><ul><a href=tutorial.jsp><li>チュートリアル</li></a><a href=#cmd><li>コマンド</li></a><a href=#item><li>アイテム</li></a><a href=#per><li>パーミッション</li></a><a href=mysql.jsp><li>MySQL連携</li></a>
+
+                                                  </div>
+
+<div id="footer">
+<small>www.mi10n.com All Right Reserved.</small>
+                                            </div>
+											</div>
+</body>				
+
+</html>
+</html>
+
+
+
+
