@@ -1,0 +1,116 @@
+@charset "utf-8";
+
+* {
+
+	
+
+}
+
+div#all {
+    overflow: auto;
+	margin:0px auto;
+
+	background-color:#f9f9f2;
+
+
+
+	width:80%;
+
+}
+
+div#back {background-image: url(/img/kesyougoubann.png);	}
+
+div#index {
+
+	border-bottom: solid 2px #eeeeee;
+
+	margin-right:240px;
+
+}
+
+div#menu{       
+
+	border-bottom: dotted 2px #eeeeee;
+
+	float:right;
+
+	width:200px;
+
+	
+
+}
+
+div#menu ul li {}
+
+div#footer {
+
+     text-align:center;
+
+	font-size:small-caps;
+
+	background-color:#484b4f;
+
+	color:#ffffff;
+
+    width:80%;
+
+	margin:0px auto;
+
+	}
+
+h3 {    
+
+    padding-left:20px;
+
+}
+
+h4 {
+
+   padding-left:40px;
+
+   margin:0;
+
+}
+
+div#body {
+
+    width:70%;
+
+    float: left;
+
+    padding:10px 20px 0px 0px;
+    
+    margin-left:30px;
+
+}	
+
+#table {
+
+	margin-left:30px;
+
+}
+
+#table th {
+
+	padding-left:20px;
+
+	padding-right:20px;
+
+}
+
+#table td {
+
+	padding-left:10px;
+
+	padding-right:10px;
+
+}
+
+#banner2 {
+       margin-top:100px;
+}
+
+
+	
+
+[EOF]
