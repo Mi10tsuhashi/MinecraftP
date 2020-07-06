@@ -104,7 +104,7 @@ public class ParkourCommand implements CommandExecutor {
 									default:
 										break;
 								}
-								String author = JavaPlugin.getPlugin(MinecraftP.class).getServer().getPlayer(DataBase.BytetoUUID(result.getBytes("uuid"))).getName();
+								String author = JavaPlugin.getPlugin(MinecraftP.class).getServer().getOfflinePlayer(DataBase.BytetoUUID(result.getBytes("uuid"))).getName();
 								p.sendMessage(ChatColor.GOLD+"Course name"+ChatColor.GRAY+": "+ChatColor.WHITE+name);
 								p.sendMessage(ChatColor.GOLD+"Author"+ChatColor.GRAY+": "+ChatColor.WHITE+author);
 								switch(JavaPlugin.getPlugin(MinecraftP.class).getDatabase().type) {
