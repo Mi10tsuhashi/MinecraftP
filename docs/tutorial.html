@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+
+<html>
+
+<div id="back">
+
+<div id="all">
+
+<head>
+
+<meta charset="UTF-8">
+
+<link rel="stylesheet" href="base.css">
+
+<title>チュートリアル</title>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-164077459-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-164077459-1');
+</script>
+
+</head>
+
+<body>
+
+<div id="index"><h1 id="title">チュートリアル</h1></div>
+<div id="body">
+<h3>コースを作る</h3>
+
+<p>デフォルトではOPも持っている人のみコースを作成できます。コースを作成するにはチェックポイントとスタート地点、ゴール地点を設置します。どのアイテムも複数設置可能です。OPを持っていることを確認してから/want creatorと打つと、creatorというアイテムが手に入ります。右クリックでGUIが開かれます。</p>
+
+<img border="0" src="./img/creator.png" width="600" height="450" alt="creatorのGUI">
+
+<p>このようなGUIが表示されましたかと思います。GUIの中のアイテムをクリックすると作成用アイテムが手に入ります。左からスタート地点を設置するためのもの、ゴール地点を設置するためのもの、チェックポイントを設置するためのものです。</p>
+<h3>コースに名前をつける</h3>
+<img border="0" src="./img/beforegui.PNG" width="600" height="450" alt="命名のGUI">
+<p>この項目は必須ではありませんが、タイムを記録する場合は名前を付ける必要があります。上の画像はset startを左クリックしたときに開かれるGUIです。パルクール名の設定はこのGUIで行います。</p>
+<img border="0" src="./img/aftergui.png" width="600" height="450" alt="命名の確認">
+<p>名前を付けることに成功すると、このようにset startのアイテムにカーソルを合せたときに表示されるloreからコース名が確認できます。この例ではsampleと設定しました。</p>
+<h3>コースの設置</h3>
+
+<p>GUIから手に入れたアイテムを右クリックで設置してください。setStartで設置した感圧版を踏むとインベントリが切り替わり、setGoalで設置した感圧版を踏むと元に戻ります。</p>
+
+<p>ゴールを踏んだ時に戻る位置はバニラのコマンドの/setworldspawn ~ ~1 ~ などで設定した地点です。</p>
+<h3>コースの削除</h3>
+<p>コースはその座標がスタート/ゴール地点だという情報と、コースそのものに関わる作成日時や作者、タイムなどの情報とに分かれて管理されています。前者のデータは感圧版を削除すると自動的に削除されます。後者は全ての同名のスタート地点が削除されたときにのみ削除されます。</p>
+<h3>プレイ中の状態</h3>
+
+<p>プレイ中は前述の通りインベントリが切り替わるだけでなく、耐性と満腹度回復が付与されます。これらの効果はQuitアイテムを使うかゴールをすると取り除かれます。ダメージを受けない設定ではなく耐性にしたのはサボテンなどのダメージによるジャンプ力の向上を利用したアスレチックを作成できるようにするためです。 ただし、落下時のダメージについては無効にしてあります。落下のたびに足止めされることはありません。また、プレイ中に奈落に落ちた場合は最後のセーブポイントもしくはスタート地点にテレポートされます。ゴールの感圧版を踏んだ時にはクリアにかかったタイムがチャット欄に表示されます。このときプレイ時に踏んだスタート用の感圧版に名前が付けられていた場合は、ベストタイムと比較して表示されるメッセージが変わります。</p>
+
+
+<div id="banner2">
+<a href="https://px.a8.net/svt/ejp?a8mat=3BBQCA+AHGUB6+50+4YTJJL" rel="nofollow">
+<img border="0" width="728" height="90" alt="" src="https://www24.a8.net/svt/bgt?aid=200421658634&wid=001&eno=01&mid=s00000000018030035000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www19.a8.net/0.gif?a8mat=3BBQCA+AHGUB6+50+4YTJJL" alt="">
+</div>
+</div>
+
+<div id="menu"><ul><a href=mysql.jsp><li>MySQL連携</li></a><a href=index.jsp><li>トップに戻る</li></a>
+                </ul></div>
+
+
+</div>
+
+<div id="footer">
+
+<small>www.mi10n.com All Right Reserved.</small>
+
+                                               </div></div>
+
+                                                   </body>
+
+</html>
